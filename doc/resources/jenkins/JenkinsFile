@@ -4,7 +4,7 @@ def govSecrets = [
                        [vaultKey: 'ARM_GOV_CLIENT_SECRET'],
                        [vaultKey: 'ARM_GOV_TENANT_ID']]],
     [path: "jenkins/operations/azure/vault-backup",
-        secretValues: [[vaultKey: 'PREPROD_SUBSCRIPTION_ID']]
+        secretValues: [[vaultKey: 'PREPROD_SUBSCRIPTION_ID']]]
         
 
 node ('argus-1') {
