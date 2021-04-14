@@ -1,28 +1,34 @@
-node {
-    withEnv(['AZURE_SUBSCRIPTION_ID=99999999-9999-9999-9999-999999999999',
-            'AZURE_TENANT_ID=99999999-9999-9999-9999-999999999999']) {
-        stage('Init') {
-            cleanWs()
-            checkout scm
-        }
+def govSecrets = [
+    [path: "/jenkins/operations/azure/government/preprod/service_principal",
+            secretValues: [[vaultKey: 'ARM_GOV_CLIENT_ID'],
+                        [vaultKey: 'ARM_GOV_CLIENT_SECRET'],
+                        [vaultKey: 'ARM_GOV_TENANT_ID']]],
+    [path: "/jenkins/operations/azure/vault-backup",
+            secretValues: [[vaultKey: 'AZURE_STORAGE_ACCESS_KEY'],
+                        [vaultKey: 'AZURE_STORAGE_ACCOUNT'],
+                        [vaultKey: 'AZURE_STORAGE_CONNECTION_STRING'],
+            [vaultKey: 'OPS_SUBSCRIPTION_ID']]]]
 
-        stage('Build') {
-            sh 'mvn clean package'
-        }
+node ('argus-1') {
+    stage('Init') {
+         cleanWs()
+         checkout scm
+    }
 
-        stage('Publish') {
-            def RESOURCE_GROUP = '<resource_group>' 
-            def FUNC_NAME = '<function_app>'
-            // login Azure
-            withCredentials([usernamePassword(credentialsId: 'azuresp', passwordVariable: 'AZURE_CLIENT_SECRET', usernameVariable: 'AZURE_CLIENT_ID')]) {
-            sh '''
-                az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID
-                az account set -s $AZURE_SUBSCRIPTION_ID
-            '''
-            }
+    stage('Build') {
+         sh 'mvn clean package'
+    }
+    stage('Login') {
+        withVault(vaultSecrets: govSecrets){
+            sh("az cloud set --name AzureUSGovernment && az account clear && rm -f /tmp/azsubs")
+            sh("az login --service-principal -u $ARM_GOV_CLIENT_ID -p $ARM_GOV_CLIENT_SECRET -t $ARM_GOV_TENANT_ID")     
+        }
+    }
+    stage('Publish') {
+        def RESOURCE_GROUP = 'test-able-gov-rg' 
+        def FUNC_NAME = 'dev-sf-iot-gov-azf'
             sh 'cd $PWD/target/azure-functions/odd-or-even-function-sample && zip -r ../../../archive.zip ./* && cd -'
             sh "az functionapp deployment source config-zip -g $RESOURCE_GROUP -n $FUNC_NAME --src archive.zip"
             sh 'az logout'
         }
-    }
 }
