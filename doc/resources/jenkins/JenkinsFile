@@ -26,8 +26,8 @@ node ('argus-1') {
         }
     }
     stage('Publish') {
-        def RESOURCE_GROUP = 'jhernandez-rg' 
-        def FUNC_NAME = 'azfunction-test5'
+        def RESOURCE_GROUP = 'test-able-gov-rg' 
+        def FUNC_NAME = 'dev-sf-iot-gov-azf'
             sh 'cd $PWD/target/azure-functions/odd-or-even-function-sample && zip -r ../../../archive.zip ./* && cd -'
             sh "az functionapp deployment source config-zip -g $RESOURCE_GROUP -n $FUNC_NAME --src archive.zip"
             sh 'az logout'
