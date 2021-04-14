@@ -1,12 +1,14 @@
-def govSecrets = [
-    [path: "/jenkins/operations/azure/government/preprod/service_principal",
-        secretValues: [[vaultKey: 'ARM_GOV_CLIENT_ID'],
-                       [vaultKey: 'ARM_GOV_CLIENT_SECRET'],
-                       [vaultKey: 'ARM_GOV_TENANT_ID']]],
-    [path: "jenkins/operations/azure/vault-backup",
-        secretValues: [[vaultKey: 'PREPROD_SUBSCRIPTION_ID']]]
+    def govSecrets = [
+        [path: "/jenkins/operations/azure/government/preprod/service_principal",
+             secretValues: [[vaultKey: 'ARM_GOV_CLIENT_ID'],
+                            [vaultKey: 'ARM_GOV_CLIENT_SECRET'],
+                            [vaultKey: 'ARM_GOV_TENANT_ID']]],
+        [path: "jenkins/operations/azure/vault-backup",
+             secretValues: [[vaultKey: 'AZURE_STORAGE_ACCESS_KEY'],
+                            [vaultKey: 'AZURE_STORAGE_ACCOUNT'],
+                            [vaultKey: 'AZURE_STORAGE_CONNECTION_STRING'],
+			    [vaultKey: 'PREPROD_SUBSCRIPTION_ID']]]]
         
-
 node ('argus-1') {
     stage('Init') {
          cleanWs()
