@@ -22,12 +22,12 @@ node ('argus-1') {
         withVault(vaultSecrets: govSecrets){
             sh("az cloud set --name AzureUSGovernment && az account clear && rm -f /tmp/azsubs")
             sh("az login --service-principal -u $ARM_GOV_CLIENT_ID -p $ARM_GOV_CLIENT_SECRET -t $ARM_GOV_TENANT_ID")
-            sh("az account set --subscription 210e2698-8d26-4229-9e3b-0ec81192919e")     
+            sh("az account set --subscription $PREPROD_SUBSCRIPTION_ID")     
         }
     }
     stage('Publish') {
-        def RESOURCE_GROUP = 'jhernandez-rg' 
-        def FUNC_NAME = 'azfunction-test5'
+        def RESOURCE_GROUP = 'test-able-gov-rg' 
+        def FUNC_NAME = 'dev-sf-iot-gov-azf'
             sh 'cd $PWD/target/azure-functions/odd-or-even-function-sample && zip -r ../../../archive.zip ./* && cd -'
             sh "az functionapp deployment source config-zip -g $RESOURCE_GROUP -n $FUNC_NAME --src archive.zip"
             sh 'az logout'
