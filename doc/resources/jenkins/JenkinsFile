@@ -22,7 +22,7 @@ node ('argus-1') {
         withVault(vaultSecrets: govSecrets){
             sh("az cloud set --name AzureUSGovernment && az account clear && rm -f /tmp/azsubs")
             sh("az login --service-principal -u $ARM_GOV_CLIENT_ID -p $ARM_GOV_CLIENT_SECRET -t $ARM_GOV_TENANT_ID")
-            sh("az account set --subscription $PREPROD_SUBSCRIPTION_ID")     
+            sh("az account set --subscription 210e2698-8d26-4229-9e3b-0ec81192919e")     
         }
     }
     stage('Publish') {
